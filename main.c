@@ -85,9 +85,6 @@ void parseJsonResponse(struct json_object *parsedJson, Response *response, Weath
     struct json_object *visibility, *country, *speed, *deg, *gust;
     struct json_object *all, *dt, *type, *sunrise, *sunset, *name, *cod, *timezone;
 
-    // Parse the JSON string
-    // parsedJson = json_tokener_parse(jsonString);
-
     // Coord object
     json_object_object_get_ex(parsedJson, "coord", &coord);
     response->coord.lon = json_object_get_double(json_object_object_get(coord, "lon"));
