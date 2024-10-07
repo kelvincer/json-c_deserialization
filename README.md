@@ -257,6 +257,8 @@ int main()
 ## Console output
 Here is the output of the previous code, running on macOS.
 ```console
+MacBook-Pro-de-kelvin:OpenWeatherMap-C kelvinc$ gcc -o o main.c -lcurl -ljson-c -g -Wall
+MacBook-Pro-de-kelvin:OpenWeatherMap-C kelvinc$ ./o
 ******** JSON RESPONSE ********
 
 {
@@ -292,7 +294,7 @@ Here is the output of the previous code, running on macOS.
   "clouds": {
     "all": 100
   },
-  "dt": 1728315820,
+  "dt": 1728316642,
   "sys": {
     "type": 1,
     "id": 6812,
@@ -329,7 +331,7 @@ wind:
         gust: 2.66
 clouds:
         all : 100.00
-dt: 1728315820
+dt: 1728316642
 sys:
         type : 1
         id : 6812
