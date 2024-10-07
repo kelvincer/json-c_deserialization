@@ -112,8 +112,7 @@ void printResponseStruct(Response response)
 
 void parseJsonResponse(struct json_object *parsedJson, Response *response, Weather **weathers)
 {
-    struct json_object *coord, *weather, *main, *wind, *clouds, *sys, *base;
-    struct json_object *visibility, *id, *dt, *name, *cod, *timezone;
+    struct json_object *coord, *weather, *main, *wind, *clouds, *sys, *base, *visibility, *dt;
 
     // Coord object
     json_object_object_get_ex(parsedJson, "coord", &coord);
@@ -174,17 +173,13 @@ void parseJsonResponse(struct json_object *parsedJson, Response *response, Weath
     response->sys.sunrise = json_object_get_int(json_object_object_get(sys, "sunrise"));
     response->sys.sunset = json_object_get_int(json_object_object_get(sys, "sunset"));
 
-    json_object_object_get_ex(parsedJson, "timezone", &timezone);
-    response->timezone = json_object_get_int(timezone);
+    response->timezone = json_object_get_int(json_object_object_get(parsedJson, "timezone"));
 
-    json_object_object_get_ex(parsedJson, "id", &id);
-    response->id = json_object_get_int(id);
+    response->id = json_object_get_int(json_object_object_get(parsedJson, "id"));
 
-    json_object_object_get_ex(parsedJson, "name", &name);
-    response->name = (char *)json_object_get_string(name);
+    response->name = (char *)json_object_get_string(json_object_object_get(parsedJson, "name"));
 
-    json_object_object_get_ex(parsedJson, "cod", &cod);
-    response->cod = json_object_get_int(cod);
+    response->cod = json_object_get_int(json_object_object_get(parsedJson, "cod"));
 }
 
 size_t writefunc(void *ptr, size_t size, size_t nmemb, Info *s)
@@ -276,12 +271,12 @@ MacBook-Pro-de-kelvin:OpenWeatherMap-C kelvinc$ ./o
   ],
   "base": "stations",
   "main": {
-    "temp": 287.8,
-    "feels_like": 287.78,
+    "temp": 287.4,
+    "feels_like": 287.23,
     "temp_min": 286.05,
     "temp_max": 287.8,
     "pressure": 1015,
-    "humidity": 94,
+    "humidity": 90,
     "sea_level": 1015,
     "grnd_level": 948
   },
@@ -294,10 +289,10 @@ MacBook-Pro-de-kelvin:OpenWeatherMap-C kelvinc$ ./o
   "clouds": {
     "all": 100
   },
-  "dt": 1728316642,
+  "dt": 1728317073,
   "sys": {
-    "type": 1,
-    "id": 6812,
+    "type": 2,
+    "id": 2004688,
     "country": "IT",
     "sunrise": 1728278470,
     "sunset": 1728319568
@@ -316,12 +311,12 @@ weathers:
         [id : 804, main : Clouds, description : overcast clouds, icon : 04d]
 base : stations
 main:
-        temp : 287.80
-        feels_like : 287.78
+        temp : 287.40
+        feels_like : 287.23
         temp_min : 286.05
         temp_max : 287.80
         pressure : 1015.00
-        humidity : 94.00
+        humidity : 90.00
         sea_level : 1015.00
         grnd_level : 948.00
 visibility: 10000
@@ -331,10 +326,10 @@ wind:
         gust: 2.66
 clouds:
         all : 100.00
-dt: 1728316642
+dt: 1728317073
 sys:
-        type : 1
-        id : 6812
+        type : 2
+        id : 2004688
         country : IT
         sunrise : 1728278470
         sunset : 1728319568
@@ -346,8 +341,8 @@ cod : 200
 This is the output using leaks tool in macOS to check memory leaks.
 ```console
 MacBook-Pro-de-kelvin:OpenWeatherMap-C kelvinc$ leaks --atExit --list  -- ./o
-o(7083) MallocStackLogging: could not tag MSL-related memory as no_footprint, so those pages will be included in process footprint - (null)
-o(7083) MallocStackLogging: recording malloc (and VM allocation) stacks using lite mode
+o(8004) MallocStackLogging: could not tag MSL-related memory as no_footprint, so those pages will be included in process footprint - (null)
+o(8004) MallocStackLogging: recording malloc (and VM allocation) stacks using lite mode
 ******** JSON RESPONSE ********
 
 {
@@ -365,12 +360,12 @@ o(7083) MallocStackLogging: recording malloc (and VM allocation) stacks using li
   ],
   "base": "stations",
   "main": {
-    "temp": 287.8,
-    "feels_like": 287.78,
+    "temp": 287.4,
+    "feels_like": 287.23,
     "temp_min": 286.05,
     "temp_max": 287.8,
     "pressure": 1015,
-    "humidity": 94,
+    "humidity": 90,
     "sea_level": 1015,
     "grnd_level": 948
   },
@@ -383,10 +378,10 @@ o(7083) MallocStackLogging: recording malloc (and VM allocation) stacks using li
   "clouds": {
     "all": 100
   },
-  "dt": 1728316459,
+  "dt": 1728317073,
   "sys": {
-    "type": 1,
-    "id": 6812,
+    "type": 2,
+    "id": 2004688,
     "country": "IT",
     "sunrise": 1728278470,
     "sunset": 1728319568
@@ -405,12 +400,12 @@ weathers:
         [id : 804, main : Clouds, description : overcast clouds, icon : 04d]
 base : stations
 main:
-        temp : 287.80
-        feels_like : 287.78
+        temp : 287.40
+        feels_like : 287.23
         temp_min : 286.05
         temp_max : 287.80
         pressure : 1015.00
-        humidity : 94.00
+        humidity : 90.00
         sea_level : 1015.00
         grnd_level : 948.00
 visibility: 10000
@@ -420,10 +415,10 @@ wind:
         gust: 2.66
 clouds:
         all : 100.00
-dt: 1728316459
+dt: 1728317073
 sys:
-        type : 1
-        id : 6812
+        type : 2
+        id : 2004688
         country : IT
         sunrise : 1728278470
         sunset : 1728319568
@@ -431,28 +426,28 @@ timezone : 7200
 id : 3163858
 name : Zocca
 cod : 200
-Process:         o [7083]
+Process:         o [8004]
 Path:            /Users/USER/*/o
-Load Address:    0x10413b000
+Load Address:    0x10034d000
 Identifier:      o
 Version:         0
 Code Type:       X86-64
 Platform:        macOS
-Parent Process:  leaks [7082]
+Parent Process:  leaks [8003]
 
-Date/Time:       2024-10-07 10:54:19.695 -0500
-Launch Time:     2024-10-07 10:54:18.472 -0500
+Date/Time:       2024-10-07 11:17:54.143 -0500
+Launch Time:     2024-10-07 11:17:52.802 -0500
 OS Version:      macOS 15.0.1 (24A348)
 Report Version:  7
 Analysis Tool:   /Applications/Xcode.app/Contents/Developer/usr/bin/leaks
 Analysis Tool Version:  Xcode 16.0 (16A242d)
 
-Physical footprint:         3572K
-Physical footprint (peak):  3572K
+Physical footprint:         3616K
+Physical footprint (peak):  3616K
 Idle exit:                  untracked
 ----
 
 leaks Report Version: 3.0
-Process 7083: 3260 nodes malloced for 229 KB
-Process 7083: 0 leaks for 0 total leaked bytes.
+Process 8004: 3260 nodes malloced for 229 KB
+Process 8004: 0 leaks for 0 total leaked bytes.
 ```
