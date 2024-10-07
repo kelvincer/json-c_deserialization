@@ -110,7 +110,7 @@ void printResponseStruct(Response response)
     printf("cod : %i\n", response.cod);
 }
 
-void parseJsonResponse(struct json_object *parsedJson, Response *response, Weather **weathers)
+void getInformationFromJsonObject(struct json_object *parsedJson, Response *response, Weather **weathers)
 {
     struct json_object *coord, *weather, *main, *wind, *clouds, *sys, *base, *visibility, *dt;
 
@@ -233,7 +233,7 @@ int main()
             Weather *weathers = NULL;
             struct json_object *jsonObject = json_tokener_parse(info.data);
             printJsonResponse(jsonObject);
-            parseJsonResponse(jsonObject, &responseStruct, &weathers);
+            getInformationFromJsonObject(jsonObject, &responseStruct, &weathers);
             printResponseStruct(responseStruct);
             free(weathers);
             json_object_put(jsonObject);
