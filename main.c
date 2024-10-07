@@ -110,8 +110,7 @@ void printResponseStruct(Response response)
 
 void parseJsonResponse(struct json_object *parsedJson, Response *response, Weather **weathers)
 {
-    struct json_object *coord, *weather, *main, *wind, *clouds, *sys, *base;
-    struct json_object *visibility, *id, *dt, *name, *cod, *timezone;
+    struct json_object *coord, *weather, *main, *wind, *clouds, *sys, *base, *visibility, *dt;
 
     // Coord object
     json_object_object_get_ex(parsedJson, "coord", &coord);
@@ -172,17 +171,13 @@ void parseJsonResponse(struct json_object *parsedJson, Response *response, Weath
     response->sys.sunrise = json_object_get_int(json_object_object_get(sys, "sunrise"));
     response->sys.sunset = json_object_get_int(json_object_object_get(sys, "sunset"));
 
-    json_object_object_get_ex(parsedJson, "timezone", &timezone);
-    response->timezone = json_object_get_int(timezone);
+    response->timezone = json_object_get_int(json_object_object_get(parsedJson, "timezone"));
 
-    json_object_object_get_ex(parsedJson, "id", &id);
-    response->id = json_object_get_int(id);
+    response->id = json_object_get_int(json_object_object_get(parsedJson, "id"));
 
-    json_object_object_get_ex(parsedJson, "name", &name);
-    response->name = (char *)json_object_get_string(name);
+    response->name = (char *)json_object_get_string(json_object_object_get(parsedJson, "name"));
 
-    json_object_object_get_ex(parsedJson, "cod", &cod);
-    response->cod = json_object_get_int(cod);
+    response->cod = json_object_get_int(json_object_object_get(parsedJson, "cod"));
 }
 
 size_t writefunc(void *ptr, size_t size, size_t nmemb, Info *s)
