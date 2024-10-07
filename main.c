@@ -89,24 +89,19 @@ void printResponseStruct(Response response)
 {
     puts("******** STRUCT RESPONSE ********");
     puts("");
-    printf("coord:\n");
-    printf("\tlon = %.2f, lat = %.2f\n", response.coord.lon, response.coord.lat);
+    printf("coord:\n\tlon : %.2f\n\tlat : %.2f\n", response.coord.lon, response.coord.lat);
     printf("weathers:\n");
     for (size_t i = 0; i < response.weathersSize; i++)
     {
         printf("\t[id : %d, main : %s, description : %s, icon : %s]\n", response.weathers[i].id, response.weathers[i].main, response.weathers[i].description, response.weathers[i].icon);
     }
     printf("base : %s\n", response.base);
-    printf("main:\n");
-    printf("\ttemp : %.2f, feels_like : %.2f, temp_min : %.2f, temp_max : %.2f, pressure : %.2f, humidity : %.2f, sea_level : %.2f, grnd_level : %.2f\n", response.main.temp, response.main.feelsLike, response.main.tempMin, response.main.tempMax, response.main.pressure, response.main.humidity, response.main.seaLevel, response.main.grndLevel);
+    printf("main:\n\ttemp : %.2f\n\tfeels_like : %.2f\n\ttemp_min : %.2f\n\ttemp_max : %.2f\n\tpressure : %.2f\n\thumidity : %.2f\n\tsea_level : %.2f\n\tgrnd_level : %.2f\n", response.main.temp, response.main.feelsLike, response.main.tempMin, response.main.tempMax, response.main.pressure, response.main.humidity, response.main.seaLevel, response.main.grndLevel);
     printf("visibility: %i\n", response.visibility);
-    printf("wind:\n");
-    printf("\tspeed : %.2f, deg: %.2f, gust: %.2f\n", response.wind.speed, response.wind.deg, response.wind.gust);
-    printf("clouds:\n");
-    printf("\tall : %.2f\n", response.clouds.all);
+    printf("wind:\n\tspeed : %.2f\n\tdeg: %.2f\n\tgust: %.2f\n", response.wind.speed, response.wind.deg, response.wind.gust);
+    printf("clouds:\n\tall : %.2f\n", response.clouds.all);
     printf("dt: %i\n", response.dt);
-    printf("sys:\n");
-    printf("\ttype : %i, id : %i, country : %s, sunrise : %i, sunset : %i\n", response.sys.type, response.sys.id, response.sys.country, response.sys.sunrise, response.sys.sunset);
+    printf("sys:\n\ttype : %i\n\tid : %i\n\tcountry : %s\n\tsunrise : %i\n\tsunset : %i\n", response.sys.type, response.sys.id, response.sys.country, response.sys.sunrise, response.sys.sunset);
     printf("timezone : %i\n", response.timezone);
     printf("id : %i\n", response.id);
     printf("name : %s\n", response.name);
@@ -116,8 +111,7 @@ void printResponseStruct(Response response)
 void parseJsonResponse(struct json_object *parsedJson, Response *response, Weather **weathers)
 {
     struct json_object *coord, *weather, *main, *wind, *clouds, *sys, *base;
-    struct json_object *visibility, *id;
-    struct json_object *dt, *name, *cod, *timezone;
+    struct json_object *visibility, *id, *dt, *name, *cod, *timezone;
 
     // Coord object
     json_object_object_get_ex(parsedJson, "coord", &coord);
