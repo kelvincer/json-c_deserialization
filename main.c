@@ -57,6 +57,7 @@ typedef struct Response
 {
     Coord coord;
     Weather *weathers;
+    int weathersSize;
     char *base;
     Main main;
     int visibility;
@@ -76,14 +77,47 @@ typedef struct Info
     size_t size;
 } Info;
 
+void printJsonResponse(struct json_object *jsonObject)
+{
+    puts("******** JSON RESPONSE ********");
+    puts("");
+    const char *jsonString = json_object_to_json_string_ext(jsonObject, JSON_C_TO_STRING_SPACED | JSON_C_TO_STRING_PRETTY);
+    printf("%s\n", jsonString);
+}
+
+void printResponseStruct(Response response)
+{
+    puts("******** STRUCT RESPONSE ********");
+    puts("");
+    printf("coord:\n");
+    printf("\tlon = %.2f, lat = %.2f\n", response.coord.lon, response.coord.lat);
+    printf("weathers:\n");
+    for (size_t i = 0; i < response.weathersSize; i++)
+    {
+        printf("\t[id : %d, main : %s, description : %s, icon : %s]\n", response.weathers[i].id, response.weathers[i].main, response.weathers[i].description, response.weathers[i].icon);
+    }
+    printf("base : %s\n", response.base);
+    printf("main:\n");
+    printf("\ttemp : %.2f, feels_like : %.2f, temp_min : %.2f, temp_max : %.2f, pressure : %.2f, humidity : %.2f, sea_level : %.2f, grnd_level : %.2f\n", response.main.temp, response.main.feelsLike, response.main.tempMin, response.main.tempMax, response.main.pressure, response.main.humidity, response.main.seaLevel, response.main.grndLevel);
+    printf("visibility: %i\n", response.visibility);
+    printf("wind:\n");
+    printf("\tspeed : %.2f, deg: %.2f, gust: %.2f\n", response.wind.speed, response.wind.deg, response.wind.gust);
+    printf("clouds:\n");
+    printf("\tall : %.2f\n", response.clouds.all);
+    printf("dt: %i\n", response.dt);
+    printf("sys:\n");
+    printf("\ttype : %i, id : %i, country : %s, sunrise : %i, sunset : %i\n", response.sys.type, response.sys.id, response.sys.country, response.sys.sunrise, response.sys.sunset);
+    printf("timezone : %i\n", response.timezone);
+    printf("id : %i\n", response.id);
+    printf("name : %s\n", response.name);
+    printf("cod : %i\n", response.cod);
+}
+
 void parseJsonResponse(struct json_object *parsedJson, Response *response, Weather **weathers)
 {
-    // struct json_object *parsedJson;
     struct json_object *coord, *weather, *main, *wind, *clouds, *sys, *base;
-    struct json_object *temp, *feelsLike, *tempMin, *tempMax, *pressure, *humidity;
-    struct json_object *weatherDescription, *id, *icon;
-    struct json_object *visibility, *country, *speed, *deg, *gust;
-    struct json_object *all, *dt, *type, *sunrise, *sunset, *name, *cod, *timezone;
+    struct json_object *visibility, *id;
+    struct json_object *dt, *name, *cod, *timezone;
 
     // Coord object
     json_object_object_get_ex(parsedJson, "coord", &coord);
@@ -96,6 +130,7 @@ void parseJsonResponse(struct json_object *parsedJson, Response *response, Weath
 
     *weathers = calloc(arrayLength, sizeof(Weather));
     response->weathers = *weathers;
+    response->weathersSize = arrayLength;
 
     for (int i = 0; i < arrayLength; i++)
     {
@@ -103,63 +138,45 @@ void parseJsonResponse(struct json_object *parsedJson, Response *response, Weath
         struct json_object *weatherItem = (struct json_object *)array_list_get_idx(weatherArray, i);
 
         // Extract information from each weather item
-        json_object_object_get_ex(weatherItem, "description", &weatherDescription);
-        json_object_object_get_ex(weatherItem, "id", &id);
-        json_object_object_get_ex(weatherItem, "icon", &icon);
-        json_object_object_get_ex(weatherItem, "main", &main);
-        response->weathers[i].description = (char *)json_object_get_string(weatherDescription);
-        response->weathers[i].icon = (char *)json_object_get_string(icon);
-        response->weathers[i].id = json_object_get_int(id);
-        response->weathers[i].main = (char *)json_object_get_string(main);
+        response->weathers[i].description = (char *)json_object_get_string(json_object_object_get(weatherItem, "description"));
+        response->weathers[i].icon = (char *)json_object_get_string(json_object_object_get(weatherItem, "icon"));
+        response->weathers[i].id = json_object_get_int(json_object_object_get(weatherItem, "id"));
+        response->weathers[i].main = (char *)json_object_get_string(json_object_object_get(weatherItem, "main"));
     }
 
     json_object_object_get_ex(parsedJson, "base", &base);
     response->base = (char *)json_object_get_string(base);
 
     json_object_object_get_ex(parsedJson, "main", &main);
-    json_object_object_get_ex(main, "temp", &temp);
-    json_object_object_get_ex(main, "feels_like", &feelsLike);
-    json_object_object_get_ex(main, "temp_min", &tempMin);
-    json_object_object_get_ex(main, "temp_max", &tempMax);
-    json_object_object_get_ex(main, "pressure", &pressure);
-    json_object_object_get_ex(main, "humidity", &humidity);
-
-    response->main.temp = json_object_get_double(temp);
-    response->main.feelsLike = json_object_get_double(feelsLike);
-    response->main.tempMin = json_object_get_double(tempMin);
-    response->main.tempMax = json_object_get_double(tempMax);
-    response->main.pressure = json_object_get_double(pressure);
-    response->main.humidity = json_object_get_double(humidity);
+    response->main.temp = json_object_get_double(json_object_object_get(main, "temp"));
+    response->main.feelsLike = json_object_get_double(json_object_object_get(main, "feels_like"));
+    response->main.tempMin = json_object_get_double(json_object_object_get(main, "temp_min"));
+    response->main.tempMax = json_object_get_double(json_object_object_get(main, "temp_max"));
+    response->main.pressure = json_object_get_double(json_object_object_get(main, "pressure"));
+    response->main.humidity = json_object_get_double(json_object_object_get(main, "humidity"));
+    response->main.seaLevel = json_object_get_double(json_object_object_get(main, "sea_level"));
+    response->main.grndLevel = json_object_get_double(json_object_object_get(main, "grnd_level"));
 
     json_object_object_get_ex(parsedJson, "visibility", &visibility);
     response->visibility = json_object_get_int(visibility);
 
     json_object_object_get_ex(parsedJson, "wind", &wind);
-    json_object_object_get_ex(wind, "speed", &speed);
-    json_object_object_get_ex(wind, "deg", &deg);
-    json_object_object_get_ex(wind, "gust", &gust);
-    response->wind.deg = json_object_get_double(speed);
-    response->wind.speed = json_object_get_double(speed);
-    response->wind.gust = json_object_get_double(gust);
+    response->wind.speed = json_object_get_double(json_object_object_get(wind, "speed"));
+    response->wind.deg = json_object_get_double(json_object_object_get(wind, "deg"));
+    response->wind.gust = json_object_get_double(json_object_object_get(wind, "gust"));
 
     json_object_object_get_ex(parsedJson, "clouds", &clouds);
-    json_object_object_get_ex(clouds, "all", &all);
-    response->clouds.all = json_object_get_double(all);
+    response->clouds.all = json_object_get_double(json_object_object_get(clouds, "all"));
 
     json_object_object_get_ex(parsedJson, "dt", &dt);
     response->dt = json_object_get_int(dt);
 
     json_object_object_get_ex(parsedJson, "sys", &sys);
-    json_object_object_get_ex(sys, "type", &type);
-    json_object_object_get_ex(sys, "id", &id);
-    json_object_object_get_ex(sys, "country", &country);
-    json_object_object_get_ex(sys, "sunrise", &sunrise);
-    json_object_object_get_ex(sys, "sunset", &sunset);
-    response->sys.type = json_object_get_int(type);
-    response->sys.id = json_object_get_int(id);
-    response->sys.country = (char *)json_object_get_string(country);
-    response->sys.sunrise = json_object_get_int(sunrise);
-    response->sys.sunset = json_object_get_int(sunset);
+    response->sys.type = json_object_get_int(json_object_object_get(sys, "type"));
+    response->sys.id = json_object_get_int(json_object_object_get(sys, "id"));
+    response->sys.country = (char *)json_object_get_string(json_object_object_get(sys, "country"));
+    response->sys.sunrise = json_object_get_int(json_object_object_get(sys, "sunrise"));
+    response->sys.sunset = json_object_get_int(json_object_object_get(sys, "sunset"));
 
     json_object_object_get_ex(parsedJson, "timezone", &timezone);
     response->timezone = json_object_get_int(timezone);
@@ -221,13 +238,14 @@ int main()
         }
         else
         {
-            Response response;
+            Response responseStruct;
             Weather *weathers = NULL;
-            struct json_object *parsedJson = json_tokener_parse(info.data);
-            parseJsonResponse(parsedJson, &response, &weathers);
-            printf("code = %i, clouds = %f, name = %s, descrip = %s\n", response.cod, response.clouds.all, response.name, response.weathers[0].description);
+            struct json_object *jsonObject = json_tokener_parse(info.data);
+            printJsonResponse(jsonObject);
+            parseJsonResponse(jsonObject, &responseStruct, &weathers);
+            printResponseStruct(responseStruct);
             free(weathers);
-            json_object_put(parsedJson);
+            json_object_put(jsonObject);
         }
 
         curl_slist_free_all(headers);
