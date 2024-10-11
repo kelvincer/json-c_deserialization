@@ -1,4 +1,7 @@
 ## Code
+- This demo is using the [Open Weather API](https://openweathermap.org/current).
+- I have been using [json-c](https://github.com/json-c/json-c) to deserialize JSON response.
+- I used [libcurl](https://curl.se/libcurl/) to make the HTTPS GET request.
 ```c
 #include <stdlib.h>
 #include <curl/curl.h>
